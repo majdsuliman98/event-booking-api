@@ -3,6 +3,8 @@ package com.majd.Event_booking.event;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.majd.Event_booking.event.dto.CreateEventRequst;
@@ -31,18 +33,16 @@ public class EventService {
         return toResponse(savedEvent);
     }
 
-    public List<EventResponse> getEvents(String city) {
-        List<Event> events;
+    public Page<EventResponse> getEvents(String city, Pageable pageable) {
+        Page<Event> events;
 
         if (city == null || city.isBlank()) {
-            events = eventRepository.findAll();
+            events = eventRepository.findAll(pageable);
         } else {
-            events = eventRepository.findByCityIgnoreCase(city);
+            events = eventRepository.findByCityIgnoreCase(city, pageable);
         }
 
-        return events.stream()
-                .map(this::toResponse)
-                .toList();
+        return events.map(this::toResponse);
     }
 
     public Optional<EventResponse> getEvent(long eventId) {

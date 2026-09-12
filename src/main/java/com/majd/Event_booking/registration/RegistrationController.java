@@ -1,6 +1,10 @@
 package com.majd.Event_booking.registration;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,4 +34,21 @@ public class RegistrationController {
     ) {
         return registrationService.register(eventId, request);
     }
+
+    @DeleteMapping("/{registrationId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelRegistration(
+            @PathVariable long eventId,
+            @PathVariable long registrationId
+    ) {
+        registrationService.cancelRegistration(eventId, registrationId);
+    }
+
+    @GetMapping
+    public List<RegistrationResponse> getRegistration(
+            @PathVariable long eventId
+    ) {
+        return registrationService.getRegistrations(eventId);
+    }
+
 }

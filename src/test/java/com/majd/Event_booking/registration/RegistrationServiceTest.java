@@ -16,9 +16,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.majd.Event_booking.common.error.ConflictException;
+import com.majd.Event_booking.common.error.NotFoundException;
 import com.majd.Event_booking.event.Event;
 import com.majd.Event_booking.event.EventRepository;
 import com.majd.Event_booking.registration.dto.CreateRegistrationRequest;
@@ -62,12 +62,15 @@ class RegistrationServiceTest {
                 ))
                 .thenReturn(true);
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        ConflictException exception = assertThrows(
+                ConflictException.class,
                 () -> registrationService.register(eventId, request)
         );
 
-        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        assertEquals(
+                "Email is already registered for this event",
+                exception.getMessage()
+        );
 
         verify(registrationRepository, never())
                 .save(any(Registration.class));
@@ -86,11 +89,11 @@ class RegistrationServiceTest {
         when(eventRepository.findByIdForUpdate(eventId))
                 .thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
                 () -> registrationService.register(eventId, request));
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("Event not found", exception.getMessage());
         
         verifyNoInteractions(registrationRepository);
 

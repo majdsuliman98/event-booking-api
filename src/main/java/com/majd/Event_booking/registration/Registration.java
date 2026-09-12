@@ -80,4 +80,8 @@ public class Registration {
     public RegistrationStatus getStatus() {
         return status;
     }
+
+    public void confirm(){
+        this.status = RegistrationStatus.CONFIRMED;
+    }
 }

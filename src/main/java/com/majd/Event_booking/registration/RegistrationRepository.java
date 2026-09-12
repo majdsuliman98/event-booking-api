@@ -19,5 +19,15 @@ public interface RegistrationRepository
             long eventId,
             RegistrationStatus status
         );
+        
+        Optional<Registration> findByIdAndEventId(
+        long registrationId,
+        long eventId
+);
+
+        Optional<Registration> findFirstByEventIdAndStatusOrderByRegisteredAtAsc(
+                long eventId,
+                RegistrationStatus status
+        );
 
 }
