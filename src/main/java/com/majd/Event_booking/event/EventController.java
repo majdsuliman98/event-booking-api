@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.majd.Event_booking.event.dto.EventResponse;
+
+import com.majd.Event_booking.event.dto.UpdateEventRequest;
+
+import com.majd.Event_booking.event.dto.CreateEventRequst;
+
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;

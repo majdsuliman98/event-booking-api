@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: event_booking
+      POSTGRES_USER: event_user
+      POSTGRES_PASSWORD: event_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - event_booking_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U event_user -d event_booking"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  event_booking_data:

@@ -1,79 +1,91 @@
 package com.majd.Event_booking.event;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.majd.Event_booking.event.dto.CreateEventRequst;
+import com.majd.Event_booking.event.dto.EventResponse;
+import com.majd.Event_booking.event.dto.UpdateEventRequest;
+
 @Service
 public class EventService {
-    private long nextId = 1;
-    private List<EventResponse> events = new ArrayList<>();
+
+    private final EventRepository eventRepository;
+
+    public EventService(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
 
     public EventResponse createEvent(CreateEventRequst request) {
-
-        EventResponse event = new EventResponse(
-                nextId,
-                request.city(),
+        Event event = new Event(
                 request.name(),
-                request.capacity());
-        events.add(event);
-        nextId++;
-        return event;
+                request.city(),
+                request.capacity(),
+                request.startsAt()
+        );
 
+        Event savedEvent = eventRepository.save(event);
+
+        return toResponse(savedEvent);
     }
 
     public List<EventResponse> getEvents(String city) {
-        if(city == null || city.isBlank()) {
-            System.out.println("Heree");
-            return List.copyOf(events);
+        List<Event> events;
+
+        if (city == null || city.isBlank()) {
+            events = eventRepository.findAll();
+        } else {
+            events = eventRepository.findByCityIgnoreCase(city);
         }
 
-        List<EventResponse> result = new ArrayList<>();
-        for (EventResponse event : events){
-            if(event.city().equalsIgnoreCase(city)) {
-                System.out.println(event);
-                result.add(event);
-            }
-        }
-
-
-
-
-        return result;
+        return events.stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public Optional<EventResponse> getEvent(long eventId) {
-        for(EventResponse event : events) {
-            if(event.id() == eventId) {
-                return Optional.of(event);
-            }
-        }
-        return Optional.empty();
+        return eventRepository.findById(eventId)
+                .map(this::toResponse);
     }
 
-    public Optional<EventResponse> updateEvent(long eventId, UpdateEventRequest request) {
+    public Optional<EventResponse> updateEvent(
+            long eventId,
+            UpdateEventRequest request
+    ) {
+        return eventRepository.findById(eventId)
+                .map(event -> {
+                    event.update(
+                            request.name(),
+                            request.city(),
+                            request.capacity(),
+                            request.startsAt()
 
-        for(int index=0; index < events.size(); index++) {
-            EventResponse event = events.get(index);
-            if(event.id() == eventId) {
-                EventResponse updatedEvent = new EventResponse(
-                        eventId,
-                        request.name(),
-                        request.city(),
-                        request.capacity());
-                        
-                events.set(index, updatedEvent);
-                return Optional.of(updatedEvent);
-            }
-        }
-        return Optional.empty();
-        
+                    );
+
+                    Event savedEvent = eventRepository.save(event);
+                    return toResponse(savedEvent);
+                });
     }
 
     public boolean deleteEvent(long eventId) {
-        return events.removeIf(event -> event.id() == eventId);
+        if (!eventRepository.existsById(eventId)) {
+            return false;
+        }
+
+        eventRepository.deleteById(eventId);
+        return true;
     }
 
+    private EventResponse toResponse(Event event) {
+        return new EventResponse(
+                event.getId(),
+                event.getName(),
+                event.getCity(),
+                event.getCapacity(),
+                event.getStartsAt()
+
+        );
+    }
 }

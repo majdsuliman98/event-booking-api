@@ -1,0 +1,9 @@
+ALTER TABLE events
+ADD COLUMN starts_at TIMESTAMP WITH TIME ZONE;
+
+UPDATE events
+SET starts_at = CURRENT_TIMESTAMP + INTERVAL '7 days'
+WHERE starts_at IS NULL;
+
+ALTER TABLE events
+ALTER COLUMN starts_at SET NOT NULL;
