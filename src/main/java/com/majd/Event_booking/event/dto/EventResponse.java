@@ -4,8 +4,8 @@ import java.time.Instant;
 
 public record EventResponse(
         long id,
-        String city,
         String name,
+        String city,
         int capacity,
         Instant startsAt
 ) {
